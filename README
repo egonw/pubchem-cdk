@@ -1,0 +1,50 @@
+1. Get a copy of PubChem
+
+$ mkdir pubchem
+$ cd pubchem
+$ wget -r ftp://ftp.ncbi.nlm.nih.gov/pubchem/Compound/CURRENT-Full/XML/ -c
+$ ln -s ftp.ncbi.nlm.nih.gov/pubchem/Compound/CURRENT-Full/XML XML
+
+2. Set up MySQL
+
+CREATE TABLE IF NOT EXISTS `compounds` (
+  `InChI` varchar(4096) NOT NULL,
+  `CID` int(11) NOT NULL,
+  `OrganicSubset` tinyint(1) NOT NULL,
+  PRIMARY KEY  (`CID`),
+  KEY `InChI` (`InChI`(1000))
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+3. Set up Groovy, CDK and MySQL 
+
+$ sudo aptitude install groovy
+$ export CLASSPATH=cdk-1.2.1.jar:mysql.jar
+
+and populate the database with structures:
+
+$ groovy populate.groovy
+
+You may want to tune the file matching algorithm to populate with the first 1M or 10M, by tuning the regular expression do filter all files in the XML folder:
+
+dir = new File("XML")
+def p = ~/Compound_0.*gz/
+
+For the first 10M structures or ~/Compound_00.*gz/ for the first million, instead of ~/Compound.*gz/ for all SD files.
+
+4. Atom Type perception
+
+Extra MySQL table:
+
+CREATE TABLE IF NOT EXISTS `atomtypeproblem` (
+  `atom` int(11) NOT NULL,
+  `element` varchar(2) NOT NULL,
+  `cid` int(11) NOT NULL,
+  KEY `cid` (`cid`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+Run the analysis:
+
+$ groovy atomtyping.groovy
+
+Again, you may want to tune the file name pattern to match only the first 10M or so.
+
