@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# Copy these files to your PHP-capable HTML server.
+
+cp -R * /var/www/pubchem

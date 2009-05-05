@@ -1,0 +1,6 @@
+<?php
+
+$user = 'foo';
+$pwd = 'bar';
+
+?>
