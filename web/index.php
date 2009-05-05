@@ -50,9 +50,13 @@ $row = mysql_fetch_assoc($result);
 if ($row) {
   $molecule = $row['CID'];
   $inchi = $row['InChI'];
+  $inchikey = $row['InChIKey']; 
   echo "<h1>CID: $molecule</h1>\n";
 
-  echo "<a href=\"http://rdf.openmolecules.net/?$inchi\">rdf.openmolecules.net</a>\n";
+  echo "$inchi <br />\n";
+  echo "$inchikey\n";
+
+  echo "<p><a href=\"http://rdf.openmolecules.net/?$inchi\">rdf.openmolecules.net</a>\n";
 
   echo "<p><a href=\"http://pubchem.ncbi.nlm.nih.gov/summary/summary.cgi?cid=$molecule\"><img width=\"200\" src=\"http://pubchem.ncbi.nlm.nih.gov/image/imgsrv.fcgi?t=l&cid=$molecule\" class=\"floatright\"/></a>\n";
 
