@@ -25,7 +25,7 @@ matcher = CDKAtomTypeMatcher.getInstance(
 );
 
 dir = new File("XML")
-def p = ~/Compound.*gz/
+def p = ~/Compound_.*gz/
 dir.eachFileMatch(p) {
   println it.name
   iterator = new IteratingPCCompoundXMLReader(
@@ -36,13 +36,27 @@ dir.eachFileMatch(p) {
   while (iterator.hasNext()) {
     IMolecule mol = iterator.next()
     cid = mol.getProperty("PubChem CID")
-    types = matcher.findMatchingAtomType(mol)
-    for (int i=1; i<=types.length; i++) {
-      if (types[i-1] == null) {
-        element = mol.getAtom(i-1).symbol
-        // println "insert into atomtypeproblem (cid, atom, element) values (${cid}, ${i}, ${element})"
-        sql.execute("insert into atomtypeproblem (cid, atom, element) values (${cid}, ${i}, ${element})")
+    hasEntry = false
+    sql.eachRow("select * from compounds where CID = $cid") {
+      hasEntry = true
+    }
+    isTyped = false
+    if (hasEntry) {
+      sql.eachRow("select * from atomtyping where cid = $cid") {
+        isTyped = true
       }
+    }
+    if (hasEntry && !isTyped) {
+      hasError = false;
+      types = matcher.findMatchingAtomType(mol)
+      for (int i=1; i<=types.length; i++) {
+        if (types[i-1] == null) {
+          element = mol.getAtom(i-1).symbol
+          sql.execute("insert into atomtypeproblem (cid, atom, element) values (${cid}, ${i}, ${element})")
+          hasError = true
+        }
+      }
+      sql.execute("insert into atomtyping (cid, hasError) values (${cid}, ${hasError})")
     }
     if (counter++ == 100) { counter = 0; print "."; }
   }

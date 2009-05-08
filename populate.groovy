@@ -19,7 +19,7 @@ def sql = Sql.newInstance(
 )
 
 dir = new File("XML")
-def p = ~/Compound_0.*gz/
+def p = ~/Compound_.*gz/
 dir.eachFileMatch(p) {
   println it.name
   iterator = new IteratingPCCompoundXMLReader(
@@ -30,9 +30,15 @@ dir.eachFileMatch(p) {
   while (iterator.hasNext()) {
     IMolecule mol = iterator.next()
     cid = mol.getProperty("PubChem CID")
-    inchi = mol.getProperty("InChI (Standard)")
-    key = mol.getProperty("InChIKey (Standard)")
-    sql.execute("insert into compounds (InChI, InChIKey, CID) values (${inchi}, ${key}, ${cid})")
+    hasEntry = false
+    sql.eachRow("select * from compounds where CID = $cid") {
+      hasEntry = true
+    }
+    if (!hasEntry) {
+      inchi = mol.getProperty("InChI (Standard)")
+      key = mol.getProperty("InChIKey (Standard)")
+      sql.execute("insert into compounds (InChI, InChIKey, CID) values (${inchi}, ${key}, ${cid})")
+    }
     if (counter++ == 100) { counter = 0; print "."; }
   }
   println ""
