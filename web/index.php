@@ -44,7 +44,7 @@ if (!($molecule)) {
 
   echo "</ul>\n";
 
-  echo "<p>Try CID <a href=\"/pubchem/?cid=556\">566</a> or element <a href=\"/pubchem/atomtyping/?element=Hg\">Hg</a>.\n";
+  echo "<p>Try CID <a href=\"/pubchem/?cid=566\">566</a> or element <a href=\"/pubchem/atomtyping/?element=Hg\">Hg</a>.\n";
 
 } else {
 
