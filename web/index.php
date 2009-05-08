@@ -34,7 +34,12 @@ if (!($molecule)) {
   $result = mysql_query("SELECT count(*) FROM atomtypeproblem");
   $row = mysql_fetch_assoc($result);
   if ($row) {
-    echo "<li>" . $row['count(*)'] . " <a href=\"/pubchem/atomtyping/\">unrecognized atom types</a></li>";
+    $result2 = mysql_query("SELECT count(*) FROM atomtyping");
+    $row2 = mysql_fetch_assoc($result2);
+    $result3 = mysql_query("SELECT count(*) FROM atomtyping WHERE hasError = TRUE");
+    $row3 = mysql_fetch_assoc($result3);
+    echo "<li>" . $row['count(*)'] . " <a href=\"/pubchem/atomtyping/\">unrecognized atom types</a> in " .
+         $row3['count(*)'] . "/" . $row2['count(*)'] . " compounds</li>";
   }
 
   echo "</ul>\n";
